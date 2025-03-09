@@ -34,12 +34,10 @@ export async function POST(req: Request) {
     try {
       await connectDB("users");
 
-      //Retrive payment
       const paymentIntent = await stripe.paymentIntents.retrieve(
         request?.paymentIntent
       );
 
-      //If payment success
       if (paymentIntent.status === "succeeded") {
         await paymentClientSecretModel.findOneAndUpdate(
           { emailId: decodeString(request?.emailId) },
@@ -72,12 +70,10 @@ export async function POST(req: Request) {
           );
         }
 
-        //Verify payement for milestone
         const userData = await userModel?.findOne({
           emailId: request?.freelancerEmailId,
         });
         let paymentId = userData?.paymentConnectId;
-        console.log(paymentId);
 
         if (!paymentId) {
           const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -99,11 +95,18 @@ export async function POST(req: Request) {
           });
           paymentId = account?.id;
         }
+        const accountLink = await stripe.accountLinks.create({
+          account: paymentId,
+          refresh_url: "https://1234abcd.ngrok.io/reauth",
+          return_url: "https://1234abcd.ngrok.io/onboarding-complete",
+          type: "account_onboarding",
+        });
 
         await userModel?.findOneAndUpdate(
           { emailId: request?.freelancerEmailId },
           {
             $set: {
+              onBoardLink: accountLink?.url ?? "",
               amount: userData?.amount + paymentIntent?.amount,
               paymentConnectId: paymentId,
             },

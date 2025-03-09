@@ -73,22 +73,35 @@ async function handleSignUpIMPL(
       apiVersion: "2025-01-27.acacia",
     });
 
-    // const account = await stripe.accounts.create({
-    //   type: "express",
-    //   email: request?.freelancerEmailId,
-    //   country: "US",
-    //   capabilities: {
-    //     transfers: { requested: true },
-    //     card_payments: {
-    //       requested: true,
-    //     },
-    //   },
-    //   business_type: "individual",
-    //   default_currency: "USD",
-    // });
+    let account;
+    let accountLink;
+
+    if (user?.role?.toLowerCase() === "freelancer") {
+      account = await stripe.accounts.create({
+        type: "express",
+        email: user?.emailId,
+        country: "US",
+        capabilities: {
+          transfers: { requested: true },
+          card_payments: {
+            requested: true,
+          },
+        },
+        business_type: "individual",
+        default_currency: "USD",
+      });
+      accountLink = await stripe.accountLinks.create({
+        account: account?.id,
+        refresh_url: "https://1234abcd.ngrok.io/reauth",
+        return_url: "https://1234abcd.ngrok.io/onboarding-complete",
+        type: "account_onboarding",
+      });
+    }
 
     await userModel.create({
-      // paymentConnectId: account?.id,
+      paymentConnectId: account?.id ?? "",
+      onBoardLink: accountLink?.url ?? "",
+
       emailId: user?.emailId,
       mobileNumber: user?.mobileNumber,
       firstName: user?.firstName,
