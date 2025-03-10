@@ -28,6 +28,7 @@ const postSchema = new Schema(
 const userSchema = new Schema(
   {
     onBoardLink: { type: String, required: false },
+    onBoardStatus: { type: String, required: false },
     authToken: { type: String, required: false, default: null },
     browserToken: { type: String, required: false, default: null },
     refreshToken: { type: String, required: false, default: null },

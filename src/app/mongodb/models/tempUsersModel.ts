@@ -3,6 +3,10 @@ import mongoose, { models, Schema } from "mongoose";
 const tempUsersSchema = new Schema({
   emailId: String,
   otp: Number,
+  tempData:{
+    required:false,
+    type:{}
+  }
 },{
   versionKey: false,
   timestamps: true

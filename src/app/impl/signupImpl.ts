@@ -92,8 +92,8 @@ async function handleSignUpIMPL(
       });
       accountLink = await stripe.accountLinks.create({
         account: account?.id,
-        refresh_url: "https://1234abcd.ngrok.io/reauth",
-        return_url: "https://1234abcd.ngrok.io/onboarding-complete",
+        refresh_url: "http://127.0.0.1:5173/onboarding",
+        return_url: "http://127.0.0.1:5173/myprofile",
         type: "account_onboarding",
       });
     }
@@ -101,6 +101,7 @@ async function handleSignUpIMPL(
     await userModel.create({
       paymentConnectId: account?.id ?? "",
       onBoardLink: accountLink?.url ?? "",
+      onBoardStatus: "PENDING",
 
       emailId: user?.emailId,
       mobileNumber: user?.mobileNumber,
