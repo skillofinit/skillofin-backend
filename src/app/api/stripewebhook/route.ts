@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   console.log(await req?.json())
   await tempUsersModel.updateOne(
     {
-      emailId: "afridayan01@gmail.com",
+      emailId: "afridayan02@gmail.com",
     },
     {
       $set: {
