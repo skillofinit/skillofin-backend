@@ -47,6 +47,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         message: responseEnums?.SUCCESS,
+        url:accountLink?.url
       },
       {
         status: 200,
