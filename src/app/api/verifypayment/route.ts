@@ -74,6 +74,7 @@ export async function POST(req: Request) {
           emailId: request?.freelancerEmailId,
         });
         let paymentId = userData?.paymentConnectId;
+        let accountLink: any = "";
 
         if (!paymentId) {
           const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -94,13 +95,13 @@ export async function POST(req: Request) {
             default_currency: "USD",
           });
           paymentId = account?.id;
+          accountLink = await stripe.accountLinks.create({
+            account: paymentId,
+            refresh_url: "http://127.0.0.1:5173/kyc",
+            return_url: "http://127.0.0.1:5173/myprofile",
+            type: "account_onboarding",
+          });
         }
-        const accountLink = await stripe.accountLinks.create({
-          account: paymentId,
-          refresh_url: "https://1234abcd.ngrok.io/reauth",
-          return_url: "https://1234abcd.ngrok.io/onboarding-complete",
-          type: "account_onboarding",
-        });
 
         await userModel?.findOneAndUpdate(
           { emailId: request?.freelancerEmailId },
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
               onBoardLink: accountLink?.url ?? "",
               amount: userData?.amount + paymentIntent?.amount,
               paymentConnectId: paymentId,
+              onBoardStatus: "STARTED",
             },
           }
         );

@@ -7,22 +7,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export async function POST(req: Request) {
   try {
-    const account = await stripe.accounts.create({
-      type: "express",
-      email: "afridayan01@gmail.com",
-      country: "US",
-      capabilities: {
-        transfers: { requested: true },
-        card_payments: {
-          requested: true,
-        },
-      },
-      business_type: "individual",
-      default_currency: "USD",
-    });
+    // const account = await stripe.accounts.create({
+    //   type: "express",
+    //   email: "afridayan01@gmail.com",
+    //   country: "US",
+    //   capabilities: {
+    //     transfers: { requested: true },
+    //     card_payments: {
+    //       requested: true,
+    //     },
+    //   },
+    //   business_type: "individual",
+    //   default_currency: "USD",
+    // });
     const accountLink = await stripe.accountLinks.create({
-      account: account?.id,
-      refresh_url: "http://127.0.0.1:5173/onboarding",
+      account: "acct_1R11TzCRwSUYOPKq",
+      refresh_url: "http://127.0.0.1:5173/kyc",
       return_url: "http://127.0.0.1:5173/myprofile",
       type: "account_onboarding",
     });

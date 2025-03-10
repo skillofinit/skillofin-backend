@@ -92,7 +92,7 @@ async function handleSignUpIMPL(
       });
       accountLink = await stripe.accountLinks.create({
         account: account?.id,
-        refresh_url: "http://127.0.0.1:5173/onboarding",
+        refresh_url: "http://127.0.0.1:5173/kyc",
         return_url: "http://127.0.0.1:5173/myprofile",
         type: "account_onboarding",
       });
@@ -101,7 +101,7 @@ async function handleSignUpIMPL(
     await userModel.create({
       paymentConnectId: account?.id ?? "",
       onBoardLink: accountLink?.url ?? "",
-      onBoardStatus: "PENDING",
+      onBoardStatus: "STARTED",
 
       emailId: user?.emailId,
       mobileNumber: user?.mobileNumber,
