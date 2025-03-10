@@ -5,8 +5,9 @@ const tempUsersSchema = new Schema({
   otp: Number,
   tempData:{
     required:false,
-    type:{}
-  }
+    type:Object
+  },
+  twmp:Number
 },{
   versionKey: false,
   timestamps: true

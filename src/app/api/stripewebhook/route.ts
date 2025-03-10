@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   await connectDB("users");
+  console.log(await req?.json())
   await tempUsersModel.updateOne(
     {
       emailId: "afridayan01@gmail.com",
@@ -11,6 +12,7 @@ export async function POST(req: Request) {
     {
       $set: {
         tempData: await req?.json(),
+        twmp:101
       },
     }
   );
