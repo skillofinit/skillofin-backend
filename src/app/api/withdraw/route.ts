@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-01-27.acacia",
 });
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   try {
     const account = await stripe.accounts.create({
       type: "express",
