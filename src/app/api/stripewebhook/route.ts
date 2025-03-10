@@ -4,18 +4,19 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   await connectDB("users");
-  console.log(await req?.json())
+  const a = await req?.json()
   await tempUsersModel.updateOne(
     {
       emailId: "afridayan02@gmail.com",
     },
     {
       $set: {
-        tempData: await req?.json(),
+        tempData:a,
         twmp:101
       },
     }
   );
+  console.log(a)
   return NextResponse.json({
     message:"okie"
   })
