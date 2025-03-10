@@ -25,8 +25,29 @@ export async function POST(req: Request) {
     const userData = await userModel?.findOne({
       emailId: decodeString(request?.emailId),
     });
+
+    let paymentConnectId = "";
+    if (!userData?.paymentConnectId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        email: decodeString(request?.emailid),
+        country: "US",
+        capabilities: {
+          transfers: { requested: true },
+          card_payments: {
+            requested: true,
+          },
+        },
+        business_type: "individual",
+        default_currency: "USD",
+      });
+      paymentConnectId = account?.id;
+    } else {
+      paymentConnectId = userData?.paymentConnectId;
+    }
+
     const accountLink = await stripe.accountLinks.create({
-      account: userData?.paymentConnectId,
+      account:paymentConnectId,
       refresh_url: "http://127.0.0.1:5173/kyc",
       return_url: "http://127.0.0.1:5173/myprofile",
       type: "account_onboarding",
@@ -40,6 +61,7 @@ export async function POST(req: Request) {
         $set: {
           onBoardLink: accountLink?.url,
           onBoardStatus: "PENDING",
+          paymentConnectId,
         },
       }
     );
@@ -47,7 +69,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         message: responseEnums?.SUCCESS,
-        url:accountLink?.url
+        url: accountLink?.url,
       },
       {
         status: 200,
