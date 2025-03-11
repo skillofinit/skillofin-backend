@@ -8,6 +8,7 @@ import {
 import connectDB from "@/app/mongodb/connectors/connectDB";
 import paymentClientSecretModel from "@/app/mongodb/models/paymentSecretModel";
 import userModel from "@/app/mongodb/models/userModel";
+import { webHookRefreshUrl, webHookReturnUrl } from "@/app/utils/appUtils";
 import { decodeString } from "@/app/utils/auth/authHandlers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -97,8 +98,8 @@ export async function POST(req: Request) {
           paymentId = account?.id;
           accountLink = await stripe.accountLinks.create({
             account: paymentId,
-            refresh_url: "http://127.0.0.1:5173/kyc",
-            return_url: "http://127.0.0.1:5173/myprofile",
+            refresh_url: webHookRefreshUrl,
+            return_url:webHookReturnUrl,
             type: "account_onboarding",
           });
         }

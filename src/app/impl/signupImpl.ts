@@ -9,7 +9,7 @@ import tempUsersModel from "../mongodb/models/tempUsersModel";
 import userModel from "../mongodb/models/userModel";
 import { sendOtp } from "../services/apiServices";
 import { userSignUpPayloadType } from "../types/userType";
-import { getOTP } from "../utils/appUtils";
+import { getOTP, webHookRefreshUrl, webHookReturnUrl } from "../utils/appUtils";
 import { hashString } from "../utils/auth/authHandlers";
 import { getAUthToken } from "../utils/auth/cookieHandlers";
 import moment from "moment-timezone";
@@ -92,8 +92,8 @@ async function handleSignUpIMPL(
       });
       accountLink = await stripe.accountLinks.create({
         account: account?.id,
-        refresh_url: "http://127.0.0.1:5173/kyc",
-        return_url: "http://127.0.0.1:5173/myprofile",
+        refresh_url: webHookRefreshUrl,
+        return_url: webHookReturnUrl,
         type: "account_onboarding",
       });
     }

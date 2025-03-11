@@ -2,6 +2,7 @@ import { responseEnums } from "@/app/enums/responseEnums";
 import connectDB from "@/app/mongodb/connectors/connectDB";
 import tempUsersModel from "@/app/mongodb/models/tempUsersModel";
 import userModel from "@/app/mongodb/models/userModel";
+import { webHookRefreshUrl, webHookReturnUrl } from "@/app/utils/appUtils";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -22,8 +23,8 @@ export async function POST(req: Request) {
           if (!data?.object?.payouts_enabled) {
             const accountLink = await stripe.accountLinks.create({
               account: accountId,
-              refresh_url: "http://127.0.0.1:5173/kyc",
-              return_url: "http://127.0.0.1:5173/myprofile",
+              refresh_url: webHookRefreshUrl,
+              return_url: webHookReturnUrl,
               type: "account_onboarding",
             });
 
