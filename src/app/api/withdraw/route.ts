@@ -9,21 +9,34 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 export async function POST(req: Request) {
   try {
     const transfer = await stripe.transfers.create({
-      amount: 100000, 
+      amount: 1000,
       currency: "usd",
-      destination: "acct_1R0qRlCAdtgfHNQO", 
+      destination: "acct_1R1UHzIJhmczZ2LJ",
       description: "Transfer to freelancer for milestone payment",
     });
+    console.log(
+      "----------------------------transfer--------------------------------------"
+    );
+    console.log(transfer);
+    console.log(
+      "----------------------------transfer end--------------------------------------"
+    );
     const payout = await stripe.payouts.create(
       {
         amount: 1000,
-        currency: "usd", 
+        currency: "usd",
       },
       {
-        stripeAccount: "acct_1R0qRlCAdtgfHNQO",
+        stripeAccount: "acct_1R1UHzIJhmczZ2LJ",
       }
     );
-
+    console.log(
+      "----------------------------payout--------------------------------------"
+    );
+    console.log(payout);
+    console.log(
+      "----------------------------payout end--------------------------------------"
+    );
     return NextResponse.json(
       {
         mesasge: responseEnums?.SUCCESS,
