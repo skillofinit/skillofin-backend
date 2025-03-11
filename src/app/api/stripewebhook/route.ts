@@ -18,11 +18,8 @@ export async function POST(req: Request) {
         const accountId = data?.object?.id;
         const emailId = data?.object?.email;
         if (data?.object?.requirements) {
-          if (
-            data?.object?.requirements?.currently_due?.length > 0 ||
-            data?.object?.requirements?.eventually_due?.length > 0 ||
-            data?.object?.requirements?.past_due?.length > 0
-          ) {
+          //data?.object?.payouts_enabled
+          if (!data?.object?.payouts_enabled) {
             const accountLink = await stripe.accountLinks.create({
               account: accountId,
               refresh_url: "http://127.0.0.1:5173/kyc",
@@ -41,11 +38,7 @@ export async function POST(req: Request) {
                 },
               }
             );
-          } else if (
-            data?.object?.requirements?.currently_due?.length === 0 ||
-            data?.object?.requirements?.eventually_due?.length === 0 ||
-            data?.object?.requirements?.past_due?.length === 0
-          ) {
+          } else if (data?.object?.payouts_enabled) {
             let bankAccountDetails;
             if (data?.object?.external_accounts?.data?.length > 0) {
               const details = data?.object?.external_accounts?.data[0];
