@@ -8,7 +8,11 @@ import {
 import connectDB from "@/app/mongodb/connectors/connectDB";
 import paymentClientSecretModel from "@/app/mongodb/models/paymentSecretModel";
 import userModel from "@/app/mongodb/models/userModel";
-import { webHookRefreshUrl, webHookReturnUrl } from "@/app/utils/appUtils";
+import {
+  getRandomId,
+  webHookRefreshUrl,
+  webHookReturnUrl,
+} from "@/app/utils/appUtils";
 import { decodeString } from "@/app/utils/auth/authHandlers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -74,44 +78,26 @@ export async function POST(req: Request) {
         const userData = await userModel?.findOne({
           emailId: request?.freelancerEmailId,
         });
-        let paymentId = userData?.paymentConnectId;
-        let accountLink: any = "";
-
-        if (!paymentId) {
-          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-            apiVersion: "2025-01-27.acacia",
-          });
-
-          const account = await stripe.accounts.create({
-            type: "express",
-            email: request?.freelancerEmailId,
-            country: "US",
-            capabilities: {
-              transfers: { requested: true },
-              card_payments: {
-                requested: true,
-              },
-            },
-            business_type: "individual",
-            default_currency: "USD",
-          });
-          paymentId = account?.id;
-          accountLink = await stripe.accountLinks.create({
-            account: paymentId,
-            refresh_url: webHookRefreshUrl,
-            return_url:webHookReturnUrl,
-            type: "account_onboarding",
-          });
-        }
 
         await userModel?.findOneAndUpdate(
           { emailId: request?.freelancerEmailId },
           {
             $set: {
-              onBoardLink: accountLink?.url ?? "",
               amount: userData?.amount + paymentIntent?.amount,
-              paymentConnectId: paymentId,
-              onBoardStatus: "STARTED",
+            },
+            $push: {
+              withdrawalHistory: {
+                $each: [
+                  {
+                    paymentId: getRandomId(),
+                    amount: paymentIntent?.amount,
+                    date: new Date(),
+                    type: "DEPOSIT",
+                    status: "COMPLETED",
+                  },
+                ],
+                $position: 0,
+              },
             },
           }
         );

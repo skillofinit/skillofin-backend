@@ -1,4 +1,8 @@
 import { responseEnums } from "@/app/enums/responseEnums";
+import connectDB from "@/app/mongodb/connectors/connectDB";
+import freelancerModel from "@/app/mongodb/models/freelancerModel";
+import userModel from "@/app/mongodb/models/userModel";
+import { decodeString } from "@/app/utils/auth/authHandlers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -8,35 +12,52 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export async function POST(req: Request) {
   try {
-    const transfer = await stripe.transfers.create({
-      amount: 1000,
+    const { amount, emailId } = await req?.json();
+    const userData = await userModel?.findOne({ emailId:decodeString(emailId) });
+    await stripe.transfers.create({
+      amount: parseInt(amount),
       currency: "usd",
-      destination: "acct_1R1UHzIJhmczZ2LJ",
-      description: "Transfer to freelancer for milestone payment",
+      destination: userData?.paymentConnectId,
+      description: "Transfer to freelancer",
     });
-    console.log(
-      "----------------------------transfer--------------------------------------"
-    );
-    console.log(transfer);
-    console.log(
-      "----------------------------transfer end--------------------------------------"
-    );
     const payout = await stripe.payouts.create(
       {
-        amount: 1000,
+        amount: parseInt(amount),
         currency: "usd",
       },
       {
-        stripeAccount: "acct_1R1UHzIJhmczZ2LJ",
+        stripeAccount: userData?.paymentConnectId,
       }
     );
-    console.log(
-      "----------------------------payout--------------------------------------"
+    await connectDB("users");
+    await freelancerModel.updateOne(
+      { emailId: userData?.emailId },
+      {
+        $push: {
+          withdrawalHistory: {
+            $each: [
+              {
+                paymentId: payout?.id,
+                amount: parseInt(amount),
+                date: new Date(),
+                type: "WITHDRAWAL",
+                status: "PENDING",
+              },
+            ],
+            $position: 0,
+          },
+        },
+      }
     );
-    console.log(payout);
-    console.log(
-      "----------------------------payout end--------------------------------------"
+    await userModel?.updateOne(
+      {
+        emailId: userData?.emailId,
+      },
+      {
+        $set: { amount: userData?.amount - parseInt(amount) },
+      }
     );
+
     return NextResponse.json(
       {
         mesasge: responseEnums?.SUCCESS,

@@ -1,5 +1,6 @@
 import { responseEnums } from "@/app/enums/responseEnums";
 import connectDB from "@/app/mongodb/connectors/connectDB";
+import freelancerModel from "@/app/mongodb/models/freelancerModel";
 import tempUsersModel from "@/app/mongodb/models/tempUsersModel";
 import userModel from "@/app/mongodb/models/userModel";
 import { webHookRefreshUrl, webHookReturnUrl } from "@/app/utils/appUtils";
@@ -13,7 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 export async function POST(req: Request) {
   try {
     await connectDB("users");
-    const { data, type } = await req?.json();
+    const { data, type, account } = await req?.json();
     if (data && type === "account.updated") {
       if (data?.object) {
         const accountId = data?.object?.id;
@@ -71,6 +72,27 @@ export async function POST(req: Request) {
             );
           }
         }
+      }
+    } else if (data && type === "payout.paid") {
+      const payoutDetails = data?.object;
+      if (payoutDetails?.status === "paid") {
+        const userData = await userModel?.findOne({
+          paymentConnectId: account,
+        });
+        await freelancerModel.updateOne(
+          {
+            emailId: userData?.emailId,
+            "withdrawalHistory.paymentId": payoutDetails,
+          },
+          {
+            $set: {
+              "withdrawalHistory.$[elem].status": "COMPLETED",
+            },
+          },
+          {
+            arrayFilters: [{ "elem.paymentId": payoutDetails }],
+          }
+        );
       }
     }
 

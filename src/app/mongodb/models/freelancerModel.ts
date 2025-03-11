@@ -68,6 +68,7 @@ const bidSchema = new Schema(
 
 const transactionSchema = new Schema(
   {
+    paymentId: { type: String, required: true },
     amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
     type: { type: String, enum: ["WITHDRAWAL", "DEPOSIT"], required: true },
@@ -136,7 +137,6 @@ const skillSchema = new Schema(
     timestamps: true,
   }
 );
-
 
 const freelancerSchema = new Schema(
   {
