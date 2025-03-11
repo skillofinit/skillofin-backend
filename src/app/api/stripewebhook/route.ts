@@ -41,6 +41,40 @@ export async function POST(req: Request) {
                 },
               }
             );
+          } else if (
+            data?.object?.requirements?.currently_due?.length === 0 ||
+            data?.object?.requirements?.eventually_due?.length === 0 ||
+            data?.object?.requirements?.past_due?.length === 0
+          ) {
+            let bankAccountDetails;
+            if (data?.object?.external_accounts?.data?.length > 0) {
+              const details = data?.object?.external_accounts?.data[0];
+              bankAccountDetails = {
+                id: details?.id,
+                account:
+                  details?.object === "bank_account" ? "Bank account" : "Card",
+                accountHolderName: details?.account_holder_name,
+                accountType: details?.account_holder_type,
+                availablePaymentMethods: details?.available_payout_methods,
+                bankName: details?.bank_name ?? "",
+                bankNumber: details?.last4 ?? "",
+                bankRoutingNumber: details?.routing_number,
+                accountCurrency: details?.currency,
+              };
+            }
+
+            await userModel?.updateOne(
+              {
+                emailId,
+              },
+              {
+                $set: {
+                  onBoardLink: "",
+                  onBoardStatus: "VERIFIED",
+                  bankAccountDetails,
+                },
+              }
+            );
           }
         }
       }
