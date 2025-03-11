@@ -33,6 +33,8 @@ export const BASE_URL = "https://skillofinapi.vercel.app/api";
 
 
 //Stripe urls
-export const webHookRefreshUrl = "http://localhost:5174/kyc"
-export const webHookReturnUrl = "http://localhost:5174/myprofile"
+// export const webHookRefreshUrl = "http://localhost:5174/kyc"
+// export const webHookReturnUrl = "http://localhost:5174/myprofile"
+export const webHookRefreshUrl = "https://www.skillofin.com//kyc"
+export const webHookReturnUrl = "https://www.skillofin.com//myprofile"
 
