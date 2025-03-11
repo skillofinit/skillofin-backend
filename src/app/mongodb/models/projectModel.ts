@@ -106,3 +106,24 @@ const projectModel =
   models.projects || mongoose.model("projects", projectSchema);
 
 export default projectModel;
+
+
+
+// emailId
+// : 
+// "MzY5YWZyaWRAZ21haWwuY29t"
+// freelancerEmailId
+// : 
+// "afridayan01@gmail.com"
+// milestoneId
+// : 
+// "67d0ac066bed1d3bad08f75e"
+// paymentIntent
+// : 
+// "pi_3R1arTIZeH9xNi2p1stZVRZv"
+// pricing
+// : 
+// false
+// projectId
+// : 
+// "67c579cb76a0c90ebeb5b3f0"

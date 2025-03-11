@@ -110,7 +110,7 @@ export async function milestoneImpl(user: {
 
   const notificationMessage = `
   <div style="font-family: Arial, sans-serif; background-color: #fff; color: #000; padding: 12px; border: 1px solid #ccc; border-radius: 6px;">
-    <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #007bff;">
+    <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #28a745;">
       New Milestone Created
     </h3>
     <p style="font-size: 12px; margin-bottom: 8px;">
@@ -119,7 +119,7 @@ export async function milestoneImpl(user: {
     <p style="font-size: 12px;"><strong style="color: #28a745;">Project Title:</strong> ${projectData?.title}</p>
     <p style="font-size: 12px;"><strong style="color: #28a745;">Milestone Description:</strong> ${newMilestone.description}</p>
     <p style="font-size: 12px;"><strong style="color: #28a745;">Due Date:</strong> ${newMilestone.dueDate}</p>
-    <p style="font-size: 12px;"><strong style="color: #28a745;">Amount:</strong> ${newMilestone.amount}</p>
+    <p style="font-size: 12px;"><strong style="color: #28a745;">Amount:</strong> $${newMilestone.amount}</p>
   </div>
 `;
 

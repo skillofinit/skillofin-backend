@@ -7,8 +7,10 @@ import {
 } from "@/app/enums/responseEnums";
 import connectDB from "@/app/mongodb/connectors/connectDB";
 import paymentClientSecretModel from "@/app/mongodb/models/paymentSecretModel";
+import projectModel from "@/app/mongodb/models/projectModel";
 import userModel from "@/app/mongodb/models/userModel";
 import {
+  BASE_URL,
   getRandomId,
   webHookRefreshUrl,
   webHookReturnUrl,
@@ -101,6 +103,46 @@ export async function POST(req: Request) {
             },
           }
         );
+
+        const updatedProject = await projectModel.findOneAndUpdate(
+          {
+            _id: request?.projectId,
+            "milestones._id": request?.milestoneId,
+          },
+          {
+            $set: {
+              "milestones.$.status": "RELEASED",
+            },
+          },
+          { new: true }
+        );
+
+        const notificationMessage = `
+      <div style="font-family: Arial, sans-serif; background-color: #fff; color: #000; padding: 12px; border: 1px solid #ccc; border-radius: 6px;">
+        <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #28a745;">
+          Payment Released
+        </h3>
+        <p style="font-size: 12px; margin-bottom: 8px;">
+          A payment has been successfully released for a milestone in your project.
+        </p>
+        <p style="font-size: 12px;"><strong style="color: #28a745;">Project Title:</strong> ${updatedProject?.title}</p>
+        <p style="font-size: 12px;"><strong style="color: #dc3545;">Milestone Amount:</strong> $${paymentIntent?.amount/100}</p>
+      </div>
+    `;
+
+        // Send notification
+        await fetch(BASE_URL + "/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: notificationMessage.trim(),
+            receiver: request?.freelancerEmailId,
+            emailId: request.emailId,
+            project: updatedProject.id,
+          }),
+        });
 
         return NextResponse.json(
           {
