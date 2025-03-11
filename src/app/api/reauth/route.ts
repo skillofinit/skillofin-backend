@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       {
         $set: {
           onBoardLink: accountLink?.url,
-          onBoardStatus: "PENDING",
+          onBoardStatus:userData?.onBoardStatus !== "VERIFIED"? "PENDING":"VERIFIED",
           paymentConnectId,
         },
       }
