@@ -15,14 +15,14 @@ export async function POST(req: Request) {
     const { amount, emailId } = await req?.json();
     const userData = await userModel?.findOne({ emailId:decodeString(emailId) });
     await stripe.transfers.create({
-      amount: parseInt(amount),
+      amount: parseInt(amount) * 100,
       currency: "usd",
       destination: userData?.paymentConnectId,
       description: "Transfer to freelancer",
     });
     const payout = await stripe.payouts.create(
       {
-        amount: parseInt(amount),
+        amount: parseInt(amount) * 100,
         currency: "usd",
       },
       {
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             $each: [
               {
                 paymentId: payout?.id,
-                amount: parseInt(amount),
+                amount: parseInt(amount) * 100,
                 date: new Date(),
                 type: "WITHDRAWAL",
                 status: "PENDING",
@@ -54,13 +54,13 @@ export async function POST(req: Request) {
         emailId: userData?.emailId,
       },
       {
-        $set: { amount: userData?.amount - parseInt(amount) },
+        $set: { amount: userData?.amount - parseInt(amount) * 100 },
       }
     );
 
     return NextResponse.json(
       {
-        mesasge: responseEnums?.SUCCESS,
+        message: responseEnums?.SUCCESS,
       },
       {
         status: 200,

@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         }
       }
     } else if (data && type === "payout.paid") {
-      const payoutDetails = data?.object;
+      const payoutDetails = data?.object ?? {};
       if (payoutDetails?.status === "paid") {
         const userData = await userModel?.findOne({
           paymentConnectId: account,
