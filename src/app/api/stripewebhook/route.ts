@@ -82,7 +82,7 @@ export async function POST(req: Request) {
         await freelancerModel.updateOne(
           {
             emailId: userData?.emailId,
-            "withdrawalHistory.paymentId": payoutDetails,
+            "withdrawalHistory.paymentId": payoutDetails?.id,
           },
           {
             $set: {
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
             },
           },
           {
-            arrayFilters: [{ "elem.paymentId": payoutDetails }],
+            arrayFilters: [{ "elem.paymentId": payoutDetails?.id }],
           }
         );
       }
